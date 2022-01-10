@@ -117,22 +117,8 @@ struct svm_params
   ~svm_params()
   {
     free(pool);
-    if (all)
-    {
-      *(all->trace_message) << "Num support = " << model->num_support << endl;
-      *(all->trace_message) << "Number of kernel evaluations = " << num_kernel_evals << " "
-                            << "Number of cache queries = " << num_cache_evals << endl;
-      *(all->trace_message) << "Total loss = " << loss_sum << endl;
-    }
     if (model) { free_svm_model(model); }
-    if (all) { *(all->trace_message) << "Done freeing model" << endl; }
-
     free(kernel_params);
-    if (all)
-    {
-      *(all->trace_message) << "Done freeing kernel params" << endl;
-      *(all->trace_message) << "Done with finish " << endl;
-    }
   }
 };
 
@@ -707,6 +693,17 @@ void learn(svm_params& params, base_learner&, example& ec)
   }
 }
 
+void finish_kernel_svm(svm_params& params)
+{
+  if (params.all != nullptr)
+  {
+    *(params.all->trace_message) << "Num support = " << params.model->num_support << endl;
+    *(params.all->trace_message) << "Number of kernel evaluations = " << num_kernel_evals << " "
+                                 << "Number of cache queries = " << num_cache_evals << endl;
+    *(params.all->trace_message) << "Total loss = " << params.loss_sum << endl;
+  }
+}
+
 VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_i& stack_builder)
 {
   options_i& options = *stack_builder.get_options();
@@ -719,7 +716,7 @@ VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_i& stack_builder)
 
   bool ksvm = false;
 
-  option_group_definition new_options("Kernel SVM");
+  option_group_definition new_options("[Reduction] Kernel SVM");
   new_options.add(make_option("ksvm", ksvm).keep().necessary().help("Kernel svm"))
       .add(make_option("reprocess", params->reprocess).default_value(1).help("Number of reprocess steps for LASVM"))
       .add(make_option("pool_greedy", params->active_pool_greedy).help("Use greedy selection on mini pools"))
@@ -789,6 +786,7 @@ VW::LEARNER::base_learner* kernel_svm_setup(VW::setup_base_i& stack_builder)
   auto* l = make_base_learner(std::move(params), learn, predict, stack_builder.get_setupfn_name(kernel_svm_setup),
       VW::prediction_type_t::scalar, VW::label_type_t::simple)
                 .set_save_load(save_load)
+                .set_finish(finish_kernel_svm)
                 .build();
 
   return make_base(*l);

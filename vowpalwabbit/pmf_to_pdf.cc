@@ -240,7 +240,7 @@ base_learner* setup(VW::setup_base_i& stack_builder)
   VW::workspace& all = *stack_builder.get_all_pointer();
   auto data = VW::make_unique<pmf_to_pdf::reduction>();
 
-  option_group_definition new_options("Convert Discrete PMF into Continuous PDF");
+  option_group_definition new_options("[Reduction] Convert Discrete PMF into Continuous PDF");
   new_options
       .add(make_option("pmf_to_pdf", data->num_actions)
                .default_value(0)
@@ -271,8 +271,8 @@ base_learner* setup(VW::setup_base_i& stack_builder)
   if (!options.was_supplied("bandwidth"))
   {
     data->bandwidth = half_leaf_width;
-    *(all.trace_message) << "Bandwidth was not supplied, setting default to half the continuous action unit range: "
-                         << data->bandwidth << std::endl;
+    all.logger.err_info(
+        "Bandwidth was not supplied, setting default to half the continuous action unit range: {}", data->bandwidth);
   }
 
   if (!(data->bandwidth >= 0.0f)) { THROW("error: Bandwidth must be positive"); }

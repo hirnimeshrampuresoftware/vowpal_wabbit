@@ -133,7 +133,7 @@ void print_result(VW::io::writer* f, float res, const v_array<char>& tag, float 
 
   std::stringstream ss;
   ss << std::fixed << res;
-  print_tag_by_ref(ss, tag);
+  if (!tag.empty()) { ss << " " << VW::string_view{tag.begin(), tag.size()}; }
   ss << std::fixed << ' ' << lb << ' ' << ub << '\n';
   const auto ss_str = ss.str();
   ssize_t len = ss_str.size();
@@ -222,7 +222,7 @@ base_learner* bs_setup(VW::setup_base_i& stack_builder)
   VW::workspace& all = *stack_builder.get_all_pointer();
   auto data = VW::make_unique<bs>();
   std::string type_string("mean");
-  option_group_definition new_options("Bootstrap");
+  option_group_definition new_options("[Reduction] Bootstrap");
   new_options
       .add(make_option("bootstrap", data->B).keep().necessary().help("K-way bootstrap by online importance resampling"))
       .add(make_option("bs_type", type_string).keep().one_of({"mean", "vote"}).help("Prediction type"));

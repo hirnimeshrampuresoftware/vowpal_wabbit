@@ -165,13 +165,14 @@ VW::LEARNER::base_learner* setup(VW::setup_base_i& stack_builder)
   size_t synthcoversize;
   bool use_synthcover = false;
   float psi;
-  config::option_group_definition new_options("Contextual Bandit Exploration with ADF (synthetic cover)");
+  config::option_group_definition new_options("[Reduction] Contextual Bandit Exploration with ADF (synthetic cover)");
   new_options
       .add(make_option("cb_explore_adf", cb_explore_adf_option)
                .keep()
                .necessary()
                .help("Online explore-exploit for a contextual bandit problem with multiline action dependent features"))
-      .add(make_option("epsilon", epsilon).keep().allow_override().help("Epsilon-greedy exploration"))
+      .add(
+          make_option("epsilon", epsilon).default_value(0.f).keep().allow_override().help("Epsilon-greedy exploration"))
       .add(make_option("synthcover", use_synthcover).keep().necessary().help("Use synthetic cover exploration"))
       .add(make_option("synthcoverpsi", psi)
                .keep()

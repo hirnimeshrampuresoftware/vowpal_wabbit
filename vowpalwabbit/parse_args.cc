@@ -49,7 +49,6 @@
 #  include "parse_example_binary.h"
 #endif
 
-using std::cout;
 using std::endl;
 using namespace VW::config;
 
@@ -533,7 +532,7 @@ std::vector<extent_term> parse_full_name_interactions(VW::workspace& all, VW::st
 void parse_feature_tweaks(options_i& options, VW::workspace& all, bool interactions_settings_duplicated,
     std::vector<std::string>& dictionary_nses)
 {
-  std::string hash_function("strings");
+  std::string hash_function;
   uint32_t new_bits;
   std::vector<std::string> spelling_ns;
   std::vector<std::string> quadratics;
@@ -565,7 +564,11 @@ void parse_feature_tweaks(options_i& options, VW::workspace& all, bool interacti
                .help("takes effect when `privacy_activation` is turned on and is the number of unique tag hashes a "
                      "weight needs to see before it is exported"))
 #endif
-      .add(make_option("hash", hash_function).keep().one_of({"strings", "all"}).help("How to hash the features"))
+      .add(make_option("hash", hash_function)
+               .default_value("strings")
+               .keep()
+               .one_of({"strings", "all"})
+               .help("How to hash the features"))
       .add(make_option("hash_seed", all.hash_seed).keep().default_value(0).help("Seed for hash function"))
       .add(make_option("ignore", ignores).keep().help("Ignore namespaces beginning with character <arg>"))
       .add(make_option("ignore_linear", ignore_linears)
@@ -581,7 +584,10 @@ void parse_feature_tweaks(options_i& options, VW::workspace& all, bool interacti
                .keep())
       .add(make_option("bit_precision", new_bits).short_name("b").help("Number of bits in the feature table"))
       .add(make_option("noconstant", noconstant).help("Don't add a constant feature"))
-      .add(make_option("constant", all.initial_constant).short_name("C").help("Set initial value of constant"))
+      .add(make_option("constant", all.initial_constant)
+               .default_value(0.f)
+               .short_name("C")
+               .help("Set initial value of constant"))
       .add(make_option("ngram", ngram_strings)
                .help("Generate N grams. To generate N grams for a single namespace 'foo', arg should be fN"))
       .add(make_option("skips", skip_strings)
@@ -992,7 +998,7 @@ void parse_example_tweaks(options_i& options, VW::workspace& all)
               .default_value(3)
               .help(
                   "Specify the number of passes tolerated when holdout loss doesn't decrease before early termination"))
-      .add(make_option("passes", all.numpasses).help("Number of Training Passes"))
+      .add(make_option("passes", all.numpasses).default_value(1).help("Number of Training Passes"))
       .add(make_option("initial_pass_length", all.pass_length).help("Initial number of examples per pass"))
       .add(make_option("examples", all.max_examples).help("Number of examples to parse"))
       .add(make_option("min_prediction", all.sd->min_label).help("Smallest prediction to output"))
@@ -1007,8 +1013,8 @@ void parse_example_tweaks(options_i& options, VW::workspace& all)
       .add(make_option("quantile_tau", loss_parameter)
                .default_value(0.5f)
                .help("Parameter \\tau associated with Quantile loss. Defaults to 0.5"))
-      .add(make_option("l1", all.l1_lambda).help("L_1 lambda"))
-      .add(make_option("l2", all.l2_lambda).help("L_2 lambda"))
+      .add(make_option("l1", all.l1_lambda).default_value(0.0f).help("L_1 lambda"))
+      .add(make_option("l2", all.l2_lambda).default_value(0.0f).help("L_2 lambda"))
       .add(make_option("no_bias_regularization", all.no_bias).help("No bias in regularization"))
       .add(make_option("named_labels", named_labels)
                .keep()
@@ -1072,7 +1078,7 @@ void parse_output_preds(options_i& options, VW::workspace& all)
   std::string predictions;
   std::string raw_predictions;
 
-  option_group_definition output_options("Output");
+  option_group_definition output_options("Prediction Output");
   output_options.add(make_option("predictions", predictions).short_name("p").help("File to output predictions to"))
       .add(make_option("raw_predictions", raw_predictions)
                .short_name("r")
@@ -1208,7 +1214,7 @@ VW::workspace& parse_args(
                .help("Don't output diagnostics and progress updates. Supplying this implies --log_level off and "
                      "--driver_output_off. Supplying this overrides an explicit log_level argument."))
       .add(make_option("driver_output_off", driver_output_off).help("Disable output for the driver."))
-      .add(make_option("driver_output_stream", driver_output_stream)
+      .add(make_option("driver_output", driver_output_stream)
                .default_value("stderr")
                .one_of({"stdout", "stderr"})
                .help("Specify the stream to output driver output to."))
@@ -1216,7 +1222,7 @@ VW::workspace& parse_args(
                .default_value("info")
                .one_of({"info", "warn", "error", "critical", "off"})
                .help("Log level for logging messages. Specifying this wil override --quiet for log output."))
-      .add(make_option("log_output_stream", log_output_stream)
+      .add(make_option("log_output", log_output_stream)
                .default_value("compat")
                .one_of({"stdout", "stderr", "compat"})
                .help("Specify the stream to output log messages to. In the past VW's choice of stream for logging "
@@ -1240,13 +1246,11 @@ VW::workspace& parse_args(
   logger.set_location(location);
 
   // Don't print a warning if the user specifically chose to use compat.
-  if (level != VW::io::log_level::off && location == VW::io::output_location::compat &&
-      !options->was_supplied("log_output_stream"))
+  if (level != VW::io::log_level::off && location == VW::io::output_location::compat)
   {
     logger.err_warn(
-        "The current default logging behavior of VW is to log to a mix of stderr and stdout for logging based "
-        "messages. This behavior is now deprecated. Please specify the stream to log to with --log_output_stream "
-        "stdout|stderr to silence this message.");
+        "The old default logging behavior of logging to a mix of stdout and stderr is deprecated. Please choose either "
+        "'stdout' or 'stderr' for --log_output to silence this warning.");
   }
 
   if (options->was_supplied("limit_output") && (upper_limit != 0)) { logger.set_max_output(upper_limit); }
@@ -1288,7 +1292,7 @@ VW::workspace& parse_args(
 
     bool strict_parse = false;
     int ring_size_tmp;
-    option_group_definition vw_args("VW");
+    option_group_definition vw_args("Parser");
     vw_args.add(make_option("ring_size", ring_size_tmp).default_value(256).help("Size of example ring"))
         .add(make_option("strict_parse", strict_parse).help("Throw on malformed examples"));
     all.options->add_and_parse(vw_args);
@@ -1301,8 +1305,9 @@ VW::workspace& parse_args(
 
     option_group_definition update_args("Update");
     update_args.add(make_option("learning_rate", all.eta).help("Set learning rate").short_name("l"))
-        .add(make_option("power_t", all.power_t).help("T power value"))
+        .add(make_option("power_t", all.power_t).default_value(0.5f).help("T power value"))
         .add(make_option("decay_learning_rate", all.eta_decay_rate)
+                 .default_value(1.f)
                  .help("Set Decay factor for learning_rate between passes"))
         .add(make_option("initial_t", all.sd->t).help("Initial t value"))
         .add(make_option("feature_mask", all.feature_mask)
@@ -1313,7 +1318,9 @@ VW::workspace& parse_args(
     option_group_definition weight_args("Weight");
     weight_args
         .add(make_option("initial_regressor", all.initial_regressors).help("Initial regressor(s)").short_name("i"))
-        .add(make_option("initial_weight", all.initial_weight).help("Set all weights to an initial value of arg"))
+        .add(make_option("initial_weight", all.initial_weight)
+                 .default_value(0.f)
+                 .help("Set all weights to an initial value of arg"))
         .add(make_option("random_weights", all.random_weights).help("Make initial weights random"))
         .add(make_option("normal_weights", all.normal_weights).help("Make initial weights normal"))
         .add(make_option("truncated_normal_weights", all.tnormal_weights).help("Make initial weights truncated normal"))
@@ -1494,7 +1501,7 @@ void parse_modules(options_i& options, VW::workspace& all, bool interactions_set
     std::vector<std::string>& dictionary_namespaces)
 {
   option_group_definition rand_options("Randomization");
-  rand_options.add(make_option("random_seed", all.random_seed).help("Seed random number generator"));
+  rand_options.add(make_option("random_seed", all.random_seed).default_value(0).help("Seed random number generator"));
   options.add_and_parse(rand_options);
   all.get_random_state()->set_random_state(all.random_seed);
 
@@ -1702,7 +1709,7 @@ VW::workspace* initialize_with_builder(std::unique_ptr<options_i, options_delete
     // upon direct query for help -- spit it out to stdout;
     if (all.options->get_typed_option<bool>("help").value())
     {
-      cout << all.options->help(enabled_reductions);
+      std::cout << all.options->help(enabled_reductions);
       exit(0);
     }
 

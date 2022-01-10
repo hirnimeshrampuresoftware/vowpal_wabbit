@@ -12,6 +12,7 @@
 #include "vw_exception.h"
 #include "shared_data.h"
 #include "vw_math.h"
+#include "vw_string_view.h"
 #include "vw_versions.h"
 #include "model_utils.h"
 
@@ -108,8 +109,8 @@ void active_print_result(VW::io::writer* f, float res, float weight, const v_arr
 
   std::stringstream ss;
   ss << std::fixed << res;
-  if (!print_tag_by_ref(ss, tag)) { ss << ' '; }
-
+  ss << " ";
+  if (!tag.empty()) { ss << VW::string_view{tag.begin(), tag.size()}; }
   if (weight >= 0) { ss << " " << std::fixed << weight; }
   ss << '\n';
   const auto ss_str = ss.str();
@@ -173,7 +174,7 @@ base_learner* active_setup(VW::setup_base_i& stack_builder)
   bool active_option = false;
   bool simulation = false;
   float active_c0;
-  option_group_definition new_options("Active Learning");
+  option_group_definition new_options("[Reduction] Active Learning");
   new_options.add(make_option("active", active_option).keep().necessary().help("Enable active learning"))
       .add(make_option("simulation", simulation).help("Active learning simulation mode"))
       .add(make_option("mellowness", active_c0)

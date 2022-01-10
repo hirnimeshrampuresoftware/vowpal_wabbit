@@ -54,7 +54,8 @@ void confidence_print_result(
   {
     std::stringstream ss;
     ss << std::fixed << res << " " << confidence;
-    if (!print_tag_by_ref(ss, tag)) ss << ' ';
+    ss << " ";
+    if (!tag.empty()) { ss << VW::string_view{tag.begin(), tag.size()}; }
     ss << '\n';
     // avoid serializing the stringstream multiple times
     auto ss_string(ss.str());
@@ -91,7 +92,7 @@ base_learner* confidence_setup(VW::setup_base_i& stack_builder)
   VW::workspace& all = *stack_builder.get_all_pointer();
   bool confidence_arg = false;
   bool confidence_after_training = false;
-  option_group_definition new_options("Confidence");
+  option_group_definition new_options("[Reduction] Confidence");
   new_options
       .add(make_option("confidence", confidence_arg).keep().necessary().help("Get confidence for binary predictions"))
       .add(make_option("confidence_after_training", confidence_after_training).help("Confidence after training"));

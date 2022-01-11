@@ -210,6 +210,8 @@ class TestVWClassifier(BaseVWTest):
         model.fit(data.x, data.y)
         actual = model.predict_proba(data.x)
         assert actual.shape[0] == 100
+        print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+        print(actual[0])
         assert np.allclose(actual[0], [0.3997, 0.6003], atol=1e-4)
 
     def test_repr(self):
@@ -274,6 +276,10 @@ class TestVWMultiClassifier(BaseVWTest):
         actual = model.predict_proba(data.x)
         assert actual.shape == (100, 2)
         expected = [0.8967, 0.1032]
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+        print(actual[0])
+        print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+        print(expected)
         assert np.allclose(actual[0], expected, atol=1e-4)
 
     def test_predict(self, data):

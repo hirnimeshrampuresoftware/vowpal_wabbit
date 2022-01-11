@@ -212,7 +212,7 @@ class TestVWClassifier(BaseVWTest):
         assert actual.shape[0] == 100
         print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
         print(actual[0])
-        assert np.allclose(actual[0], [0.3997, 0.6003], atol=1e-4)
+        assert np.allclose(actual[0], [0.3995, 0.6004], atol=1e-4)
 
     def test_repr(self):
         model = VWClassifier()
@@ -275,7 +275,7 @@ class TestVWMultiClassifier(BaseVWTest):
         model.fit(data.x, data.y)
         actual = model.predict_proba(data.x)
         assert actual.shape == (100, 2)
-        expected = [0.8967, 0.1032]
+        expected = [0.8966, 0.1033]
         print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
         print(actual[0])
         print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')

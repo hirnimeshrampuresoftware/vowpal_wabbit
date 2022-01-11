@@ -98,7 +98,7 @@ class TestVW(BaseVWTest):
         actual = model.predict(data.x[:1][:1])[0]
         print('11111111111111111111111111111111111111111111111')
         print(actual)
-        assert np.isclose(actual, 0.406929, atol=1e-4)
+        assert np.isclose(actual, 0.4074, atol=1e-4)
 
     def test_predict_no_convert(self):
         model = VW(loss_function='logistic', convert_to_vw=False)
@@ -106,7 +106,7 @@ class TestVW(BaseVWTest):
         actual = model.predict(['| good'])[0]
         print('***********************************************')
         print(actual)
-        assert np.isclose(actual, 0.245515, atol=1e-4)
+        assert np.isclose(actual, 0.245374, atol=1e-4)
 
     def test_set_params(self):
         model = VW()
@@ -209,7 +209,7 @@ class TestVWClassifier(BaseVWTest):
         assert actual.shape[0] == 100
         print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1')
         print(actual[0])
-        assert np.isclose(actual[0], 0.4069, atol=1e-4)
+        assert np.isclose(actual[0], 0.4074, atol=1e-4)
 
     def test_predict_proba(self, data):
         model = VWClassifier()

@@ -96,7 +96,7 @@ class TestVW(BaseVWTest):
         model = VW(loss_function='logistic')
         model.fit(data.x, data.y)
         actual = model.predict(data.x[:1][:1])[0]
-        print('\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\')
+        print('11111111111111111111111111111111111111111111111')
         print(actual)
         assert np.isclose(actual, 0.406929, atol=1e-4)
 

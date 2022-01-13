@@ -210,10 +210,11 @@ class TestVWClassifier(BaseVWTest):
         model.fit(data.x, data.y)
         actual = model.decision_function(data.x)
         assert actual.shape[0] == 100
-        if platform.machine() == "aarch64":
-            assert np.isclose(actual[0], 0.4074, atol=1e-4)
-        else:
-            assert np.isclose(actual[0], 0.4069, atol=1e-4)
+        assert np.isclose(actual[0], 0.4069, atol=1e-2)
+  #      if platform.machine() == "aarch64":
+   #         assert np.isclose(actual[0], 0.4074, atol=1e-4)
+    #    else:
+     #       assert np.isclose(actual[0], 0.4069, atol=1e-4)
         
 
     def test_predict_proba(self, data):
@@ -221,10 +222,11 @@ class TestVWClassifier(BaseVWTest):
         model.fit(data.x, data.y)
         actual = model.predict_proba(data.x)
         assert actual.shape[0] == 100
-        if platform.machine() == "aarch64":
-            assert np.allclose(actual[0], [0.3995, 0.6004], atol=1e-4)
-        else:
-            assert np.allclose(actual[0], [0.3997, 0.6003], atol=1e-4)
+        assert np.allclose(actual[0], [0.3997, 0.6003], atol=1e-6)
+#        if platform.machine() == "aarch64":
+ #           assert np.allclose(actual[0], [0.3995, 0.6004], atol=1e-4)
+  #      else:
+   #         assert np.allclose(actual[0], [0.3997, 0.6003], atol=1e-4)
 
     def test_repr(self):
         model = VWClassifier()

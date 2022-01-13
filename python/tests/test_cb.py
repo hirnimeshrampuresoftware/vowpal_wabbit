@@ -43,9 +43,12 @@ def test_getting_started_example_legacy_cb():
 
 def helper_getting_started_example(which_cb):
     train_df, test_df = helper_get_data()
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    print(which_cb)
 
     vw = pyvw.vw(which_cb + " 4 --log_level off", enable_logging=True)
-
+    print('11111111111111111111111111111111111111111111111111122222222222222222222222222222222222222222')
+    print(vw)
     for i in train_df.index:
         action = train_df.loc[i, "action"]
         cost = train_df.loc[i, "cost"]

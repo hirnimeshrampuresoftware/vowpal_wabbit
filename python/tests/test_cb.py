@@ -19,7 +19,7 @@ def helper_get_data():
 
     train_df = pd.DataFrame(train_data)
 
-    train_df['index'] = range(1, len(train_df) + 1)
+    train_df['index'] = range(1, len(train_df) + 2)
     train_df = train_df.set_index("index")
 
     test_data = [{'feature1': 'b', 'feature2': 'c', 'feature3': ''},
@@ -30,7 +30,7 @@ def helper_get_data():
     test_df = pd.DataFrame(test_data)
 
     # Add index to data frame
-    test_df['index'] = range(1, len(test_df) + 1)
+    test_df['index'] = range(1, len(test_df) + 2)
     test_df = test_df.set_index("index")
 
     return train_df, test_df

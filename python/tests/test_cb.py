@@ -90,8 +90,7 @@ def helper_getting_started_example(which_cb):
         for j, i in zip(actual, output):
             print(i)
             print(j)
-            assert np.isclose(i, j, atol=1e-4) #"line mismatch should be: " + j + " output: " + i)
-
+            assertAlmostEqual i == j
 def test_getting_started_example_with():
     train_df, test_df = helper_get_data()
 
